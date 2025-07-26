@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Dana Desa Logo](img/logo.png)
+![Dana Desa Logo](/img/logo-danadesa.png)
 
 **Sistem Transparansi Dana Desa Berbasis Blockchain**
 
