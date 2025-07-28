@@ -233,6 +233,11 @@ We welcome contributions! Please follow these steps:
 - Write comprehensive tests
 - Update documentation
 
+## Web
+
+You can access on this site =
+https://its.id/m/danadesa
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -244,12 +249,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS** for the utility-first CSS framework
 - **Radix UI** for accessible components
 - **Indonesian Government** for village fund transparency initiatives
-
-## 📞 Contact
-
-- **Project Link**: [https://github.com/yourusername/danadesa](https://github.com/yourusername/danadesa)
-- **Email**: contact@danadesa.id
-- **Website**: [https://danadesa.id](https://danadesa.id)
 
 ## 🔮 Roadmap
 
