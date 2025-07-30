@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { MapPin, Search, TrendingUp, Users, Wallet, Eye, Filter } from "lucide-react"
 import Link from "next/link"
+import { ethers } from "ethers"
 
 const projects = [
   {
@@ -62,6 +63,58 @@ const formatCurrency = (amount: number) => {
 
 export default function PublicDashboard() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [web3Provider, setWeb3Provider] = useState<ethers.providers.Web3Provider | null>(null)
+  const [contract, setContract] = useState<ethers.Contract | null>(null)
+  const [account, setAccount] = useState<string>("")
+  const [isConnected, setIsConnected] = useState(false)
+  const [blockchainData, setBlockchainData] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3" // Replace with actual deployed address
+  const contractABI = [
+    "function salurkanDana(string memory desa, uint jumlah, string memory keterangan) public",
+    "function getRiwayatDistribusi() public view returns (tuple(string desa, uint jumlah, string keterangan, uint timestamp)[])",
+    "function totalDana() public view returns (uint)",
+    "event DanaDisalurkan(string desa, uint jumlah, string keterangan, uint timestamp)",
+  ]
+
+  useEffect(() => {
+    connectWallet()
+    loadBlockchainData()
+  }, [])
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        await provider.send("eth_requestAccounts", [])
+        const signer = provider.getSigner()
+        const address = await signer.getAddress()
+        const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
+
+        setWeb3Provider(provider)
+        setContract(contractInstance)
+        setAccount(address)
+        setIsConnected(true)
+      } catch (error) {
+        console.error("Error connecting wallet:", error)
+      }
+    }
+  }
+
+  const loadBlockchainData = async () => {
+    if (contract) {
+      try {
+        setIsLoading(true)
+        const riwayat = await contract.getRiwayatDistribusi()
+        setBlockchainData(riwayat)
+      } catch (error) {
+        console.error("Error loading blockchain data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
 
   const totalProjects = projects.length
   const totalFunds = projects.reduce((sum, project) => sum + project.totalFund, 0)
@@ -104,6 +157,18 @@ export default function PublicDashboard() {
                 <Filter className="w-4 h-4 mr-2" />
                 Filter
               </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              {isConnected ? (
+                <Badge variant="default" className="bg-green-100 text-green-800">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                  Connected: {account.slice(0, 6)}...{account.slice(-4)}
+                </Badge>
+              ) : (
+                <Button onClick={connectWallet} variant="outline" size="sm">
+                  Connect Wallet
+                </Button>
+              )}
             </div>
           </div>
         </div>
